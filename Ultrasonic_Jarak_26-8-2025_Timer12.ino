@@ -407,7 +407,7 @@ void loop() {
   int cm4 = distance_cm[3];
 
   // === aturan: jika salah satu "--", lampu OFF ===
-   bool anyInvalid = (cm2<0 && cm3<0 && cm2<25 && cm3<25);
+   bool anyInvalid = (cm2<0 && cm3<0 && cm1<25 && cm4<25);
 
    int dmin = minValid4(cm1, cm2, cm3, cm4);
    updateWarningLamp(dmin, anyInvalid, now);
