@@ -15,7 +15,8 @@ const int ECHO3 = 1;      // PD1
 const int TRIG4 = 20;     // tinggal masukkan pin
 const int ECHO4 = 21;     // PD1
 
-const int lampu = 19;     // PC5
+// const int lampu = 19;     // PC5
+const int lampu = 3;     // PC5
 
 byte image03[8] = {0b01000,0b11100,0b11110,0b11110,0b00000,0b00000,0b00000,0b00000};
 byte image02[8] = {0b00000,0b00111,0b01111,0b11111,0b11100,0b11110,0b11110,0b11110};
@@ -30,7 +31,7 @@ const unsigned long TOUT_US = 30000UL; // 30 ms
 const unsigned long GAP_MS  = 80;      // anti-crosstalk utk JSN/SR04M
 
 // === PARAM LOGIKA WARNING BARU ===
-const bool LED_ACTIVE_LOW     = true;   // ubah ke false jika modul aktif-HIGH
+const bool LED_ACTIVE_LOW     = false;   // ubah ke false jika modul aktif-HIGH
 const int  START_DIST_CM      = 300;    // mulai bunyi pada 3 m
 const int  SOLID_DIST_CM      = 40;     // <= 40 cm: nyala terus
 const unsigned ON_MS          = 50;     // 50 ms hidup
