@@ -153,7 +153,7 @@ void loop(){
     int cm4 = measure(TRIG4,ECHO4);
 
     // === aturan: jika salah satu "--", lampu OFF ===
-    bool anyInvalid = (cm1<0) || (cm2<0) || (cm3<0) || (cm4<0);
+    bool anyInvalid = ((cm1<25) && (cm2<0) && (cm3<0) && (cm4<25));
 
     int dmin = minValid3(cm1, cm2, cm3, cm4);  // jarak terdekat (valid)
     updateWarningLamp(dmin, anyInvalid, now);
