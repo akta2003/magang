@@ -26,7 +26,8 @@ const uint8_t TRIG[4] = {16, 15, 14, 20};
 const uint8_t ECHO[4] = { 0, 10,  1, 21};
 
 // ===== LED indikator =====
-const int  lampu = 19;                 // PC5
+// const int  lampu = 19;                 // PC5
+const int lampu = 3;     // PC5
 
 // ===== Custom characters (punyamu, dibiarkan) =====
 byte image03[8] = {0b01000, 0b11100, 0b11110, 0b11110, 0b00000, 0b00000, 0b00000, 0b00000};
@@ -51,7 +52,7 @@ const uint16_t GAP_MS  = 80;      // jeda antar sensor JSN-SR04T waterproof
 // bool blinkEnable = false;
 // bool ledState = false;
 
-const bool LED_ACTIVE_LOW     = true;   // ubah ke false jika modul aktif-HIGH
+const bool LED_ACTIVE_LOW     = false;   // ubah ke false jika modul aktif-HIGH
 const int  START_DIST_CM      = 300;    // mulai bunyi pada 3 m
 const int  SOLID_DIST_CM      = 40;     // <= 40 cm: nyala terus
 const unsigned ON_MS          = 50;     // 50 ms hidup
