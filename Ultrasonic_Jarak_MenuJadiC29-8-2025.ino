@@ -25,7 +25,8 @@ const uint8_t button2 = 12;
 const uint8_t button3 = 18;
 
 // ===== LED indikator =====
-const int  lampu = 3; // BUZZER 3 / LAMPU 19
+const int  buzzer = 3; // BUZZER 3 / LAMPU 19
+const int  lampu = 19; // BUZZER 3 / LAMPU 19
 
 #define SHORT_PRESS_MAX 500
 #define LONG_PRESS_MIN 1000
@@ -118,7 +119,8 @@ const uint32_t TOUT_US = 30000UL;  // timeout echo ~30 ms (≈ 5 m)
 const uint16_t GAP_MS  = 60;      // jeda antar sensor JSN-SR04T waterproof
 
 // ===== Parameter BUZZER/LED =====
-const bool LED_ACTIVE_LOW     = false;   // ubah ke false jika modul aktif-HIGH
+const bool LED_ACTIVE_LOW     = true;   // ubah ke false jika modul aktif-HIGH
+const bool BUZZER_ACTIVE_LOW     = false;   // ubah ke false jika modul aktif-HIGH
 int  START_DIST_CM      = 400;    // mulai bunyi pada 3 m
 int  SOLID_DIST_CM      = 50;     // <= 40 cm: nyala terus
 const int START_MAX = 500;  // batas atas START
@@ -134,7 +136,11 @@ unsigned long phaseStartMs = 0;
 
 inline void setLampu(bool on){
   digitalWrite(lampu, LED_ACTIVE_LOW ? (on ? LOW : HIGH): (on ? HIGH : LOW)); //apakah led aktif low?? jika ya aktifkan yang (on ? LOW : HIGH) jika tidak yang satunya, apakah on true? jika ya write low jika gk ya high
-} 
+}
+
+inline void setBuzzer(bool on){
+  digitalWrite(buzzer, LED_ACTIVE_LOW ? (on ? LOW : HIGH): (on ? HIGH : LOW)); //apakah led aktif low?? jika ya aktifkan yang (on ? LOW : HIGH) jika tidak yang satunya, apakah on true? jika ya write low jika gk ya high
+}
 
 
 // ===== State pembacaan (ISR) =====
@@ -333,7 +339,9 @@ void setup() {
   pinMode(button3, INPUT_PULLUP);
 
   pinMode(lampu, OUTPUT);
+  pinMode(buzzer, OUTPUT);
   setLampu(false);
+  setBuzzer(false);
 
   pass_load();
   thresh_load();
@@ -413,18 +421,23 @@ void loop() {
 
         // Jarak minimal (pakai meter 1 desimal, atau cm kalau kamu mau)
         //lcd.setCursor(0,1); lcd.print(F("Jarak: "));
+        lcd.setCursor(0,1);
         if (dmin < 0) {
           lcd.print(F("      ----      "));
         } else {
         // cetak meter 1 desimal tanpa sprintf
-        uint16_t cm = (uint16_t)dmin;
+        //uint16_t cm = (uint16_t)dmin;
         // uint16_t whole = cm / 100;
         // uint8_t  tenth = (cm % 100) / 10;
         // lcd.print(whole); lcd.print('.');
         // lcd.print(tenth);
         // lcd.print(F(" m   "));
-        printCell(1, 1, F("Jarak : "), dmin);
-        lcd.print(F("CM"));
+        // printCell(1, 1, F("Jarak : "), dmin);
+        // lcd.print(F("CM"));
+        lcd.print(F("Jarak: "));
+        if (dmin < 10)      { lcd.print(dmin); lcd.print(F("   cm  ")); }
+        else if (dmin < 100){ lcd.print(dmin); lcd.print(F("  cm  "));  }
+        else                { lcd.print(dmin); lcd.print(F(" cm  "));   }
 
         }
 
@@ -1043,16 +1056,16 @@ void printCell(int col, int row, const __FlashStringHelper* label, int val) {
 
 //============== WARNING BUZZER BLINK=============================
 void updateWarningLamp(int dmin, bool anyInvalid, unsigned long now){
-  // 1) Jika ada sensor "--" => lampu OFF
-  if (anyInvalid) { setLampu(false); phase = PH_OFF; phaseStartMs = now; return; }
+  // 1) Jika semua sensor "--" => lampu/buzzer OFF
+  if (anyInvalid) { setLampu(false); setBuzzer(false); phase = PH_OFF; phaseStartMs = now; return; }
 
-  // 2) Jika semua > 300 cm atau tak ada baca valid => OFF
-  // if (dmin == -1 || dmin > START_DIST_CM) {
-  //   setLampu(false); phase = PH_OFF; phaseStartMs = now; return;
-  // }
+  //2) Jika semua > 300 cm atau tak ada baca valid => OFF
+  if (dmin < 0 || dmin > START_DIST_CM) {
+    setLampu(false); setBuzzer(false); phase = PH_OFF; phaseStartMs = now; return;
+  }
 
   // 3) Jika <= 40 cm => ON solid
-  if (dmin <= SOLID_DIST_CM) { setLampu(true); return; }
+  if (dmin <= SOLID_DIST_CM) { setLampu(true); setBuzzer(true); return; }
 
   // 4) 40..300 cm => kedip: ON 50ms, OFF menurun dari 950ms -> 0ms
   unsigned long offTarget = offMsFromDistance(dmin);
@@ -1060,12 +1073,14 @@ void updateWarningLamp(int dmin, bool anyInvalid, unsigned long now){
   if (phase == PH_ON) {
     if (now - phaseStartMs >= ON_MS) {
       setLampu(false);
+      setBuzzer(false);
       phase = PH_OFF;
       phaseStartMs = now;
     }
   } else { // PH_OFF
     if (now - phaseStartMs >= offTarget) {
       setLampu(true);
+      setBuzzer(true);
       phase = PH_ON;
       phaseStartMs = now;
     }
@@ -1326,6 +1341,7 @@ static inline void buzzer_service(){
   if (btnBeepRequest){
     btnBeepRequest = false;  // konsumsi
     setLampu(true);
+    setBuzzer(true);
     on = true;
     offAt = millis() + 50;   // 50 ms
   }
@@ -1333,6 +1349,7 @@ static inline void buzzer_service(){
   // matikan setelah 50 ms
   if (on && (long)(millis() - offAt) >= 0){
     setLampu(false);
+    setBuzzer(false);
     on = false;
   }
 }
