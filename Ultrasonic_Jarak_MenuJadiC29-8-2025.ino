@@ -139,7 +139,7 @@ inline void setLampu(bool on){
 }
 
 inline void setBuzzer(bool on){
-  digitalWrite(buzzer, LED_ACTIVE_LOW ? (on ? LOW : HIGH): (on ? HIGH : LOW)); //apakah led aktif low?? jika ya aktifkan yang (on ? LOW : HIGH) jika tidak yang satunya, apakah on true? jika ya write low jika gk ya high
+  digitalWrite(buzzer, BUZZER_ACTIVE_LOW ? (on ? LOW : HIGH): (on ? HIGH : LOW)); //apakah led aktif low?? jika ya aktifkan yang (on ? LOW : HIGH) jika tidak yang satunya, apakah on true? jika ya write low jika gk ya high
 }
 
 
